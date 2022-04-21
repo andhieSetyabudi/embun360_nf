@@ -1,0 +1,7 @@
+interfaceSetting.c:29:6:interfaceSetting_onPrevious	8	static
+interfaceSetting.c:34:6:interfaceSetting_onNext	8	static
+interfaceSetting.c:39:6:interfaceSetting_onOK	8	static
+interfaceSetting.c:46:6:interfaceSetting_initButton	8	static
+interfaceSetting.c:54:6:interfaceSetting_init	8	static
+interfaceSetting.c:64:6:interfaceSetting_deInit	8	static
+interfaceSetting.c:72:6:interfaceSetting_loop	8	static

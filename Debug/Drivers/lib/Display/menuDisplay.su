@@ -1,0 +1,12 @@
+menuDisplay.c:13:6:menuDisplay_create	16	static
+menuDisplay.c:24:6:menuDisplay_next	16	static
+menuDisplay.c:30:6:menuDisplay_previous	16	static
+menuDisplay.c:37:6:menuDisplay_resetPosition	16	static
+menuDisplay.c:41:9:menuDisplay_getPosition	16	static
+menuDisplay.c:45:6:menuDisplay_setMenu	24	static
+menuDisplay.c:50:6:menuDisplay_attachDateTime	24	static
+menuDisplay.c:56:6:menuDisplay_setTitle	16	static
+menuDisplay.c:60:6:menuDisplay_setCursor	16	static
+menuDisplay.c:66:6:menuDisplay_drawHeader	56	static
+menuDisplay.c:89:6:menuDisplay_drawMenu	56	static
+menuDisplay.c:126:6:menuDisplay_draw	16	static

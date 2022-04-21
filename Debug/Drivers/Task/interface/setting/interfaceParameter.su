@@ -1,0 +1,12 @@
+BSP.h:113:24:normalizeMinimumTemperature	16	static
+BSP.h:124:24:normalizeMinimumHumidity	16	static
+interfaceParameter.c:27:6:interfaceParameter_onPrevious	16	static
+interfaceParameter.c:45:6:interfaceParameter_onNext	16	static
+interfaceParameter.c:67:6:interfaceParameter_onOK	8	static
+interfaceParameter.c:72:6:interfaceParameter_onAccept	4	static
+interfaceParameter.c:77:6:interfaceParameter_buttonInit	8	static
+interfaceParameter.c:86:6:interfaceParameter_init	8	static
+interfaceParameter.c:98:6:interfaceParameter_deInit	8	static
+interfaceParameter.c:103:13:interfaceParameter_updateList	16	static
+interfaceParameter.c:109:13:interfaceParameter_blinkingValue	32	static
+interfaceParameter.c:137:6:interfaceParameter_loop	24	static

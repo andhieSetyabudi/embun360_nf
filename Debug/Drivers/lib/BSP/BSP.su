@@ -1,0 +1,14 @@
+BSP.c:12:8:getUUID	56	static
+BSP.c:25:7:ftoa	48	static
+BSP.c:81:10:twoByteTo16bit	0	static
+BSP.c:89:6:uint16toTwoByte	0	static
+BSP.c:95:10:fourByteToUint32t	0	static
+BSP.c:105:7:fourByteToFloat	0	static
+BSP.c:117:6:floatToFourByte	4	static
+BSP.c:127:6:initEEPROM	8	static
+BSP.c:147:6:eeprom_buffer_fill	16	static
+BSP.c:163:6:eeprom_buffer_flush	16	static
+BSP.c:179:6:eeprom_buffer_read	24	static
+BSP.c:187:6:eeprom_buffer_write	24	static
+BSP.c:196:10:readWordFromEEPROM	16	static
+BSP.c:206:6:writeWordToEEPROM	24	static

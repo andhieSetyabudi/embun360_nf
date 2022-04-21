@@ -1,0 +1,6 @@
+interfaceAbout.c:20:6:interfaceAbout_onPressed	4	static
+interfaceAbout.c:25:6:interfaceAbout_onNext	4	static
+interfaceAbout.c:31:6:interfaceAbout_onPrevious	4	static
+interfaceAbout.c:37:6:interfaceAbout_init	8	static
+interfaceAbout.c:51:6:interfaceAbout_deInit	8	static
+interfaceAbout.c:60:6:interfaceAbout_loop	112	static

@@ -1,0 +1,10 @@
+AHT10.c:14:13:AHT10_delay	16	static
+AHT10.c:22:17:AHT10_getTick	8	static
+AHT10.c:30:21:AHT10_read	32	static
+AHT10.c:38:21:AHT10_write	32	static
+AHT10.c:45:21:AHT10_detect	24	static
+AHT10.c:53:21:AHT10_begin	40	static
+AHT10.c:96:21:AHT10_getEvent	56	static
+AHT10.c:173:16:AHT10_getStatus	24	static
+AHT10.c:184:14:AHT10_getTemperature	16	static
+AHT10.c:190:14:AHT10_getHumidity	16	static

@@ -1,0 +1,6 @@
+stm32_rtc.h:23:19:weekDayOf	32	static
+stm32_rtc.c:11:6:rtc_init	24	static
+stm32_rtc.c:34:6:rtc_getDateTime	16	static
+stm32_rtc.c:39:6:rtc_setDateTime	16	static
+stm32_rtc.c:52:38:rtc_get_memory	32	static
+stm32_rtc.c:71:38:rtc_put_memory	32	static

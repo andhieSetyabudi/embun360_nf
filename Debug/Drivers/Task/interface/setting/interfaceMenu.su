@@ -1,0 +1,7 @@
+interfaceMenu.c:32:6:interfaceMenu_onPrevious	8	static
+interfaceMenu.c:37:6:interfaceMenu_onNext	8	static
+interfaceMenu.c:42:6:interfaceMenu_onOK	8	static
+interfaceMenu.c:49:6:interfaceMenu_initButton	8	static
+interfaceMenu.c:57:6:interfaceMenu_init	8	static
+interfaceMenu.c:67:6:interfaceMenu_deInit	8	static
+interfaceMenu.c:75:6:interfaceMenu_loop	16	static

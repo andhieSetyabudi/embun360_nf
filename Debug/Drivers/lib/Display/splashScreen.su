@@ -1,0 +1,4 @@
+splashScreen.c:15:6:splScr_attachHalt	16	static
+splashScreen.c:20:6:splScr_halt	16	static
+splashScreen.c:29:6:splScr_init	24	static
+splashScreen.c:37:6:splScr_displaySplash	56	static

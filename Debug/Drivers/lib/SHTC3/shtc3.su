@@ -1,0 +1,14 @@
+shtc3.c:28:17:SHTC3_CheckCrc	24	static
+shtc3.c:55:14:SHTC3_CalcTemperature	16	static
+shtc3.c:62:14:SHTC3_CalcHumidity	16	static
+shtc3.c:70:17:SHTC3_sendCMD	40	static
+shtc3.c:78:17:SHTC3_read	32	static
+shtc3.c:85:17:SHTC3_write	32	static
+shtc3.c:92:17:SHTC3_detect	24	static
+shtc3.c:100:17:SHTC3_wakeup	24	static
+shtc3.c:108:17:SHTC3_sleep	24	static
+shtc3.c:117:17:SHTC3_begin	32	static
+shtc3.c:132:17:SHTC3_checkID	24	static
+shtc3.c:153:17:SHTC3_getEvent	24	static
+shtc3.c:183:14:SHTC3_getTemperature	16	static
+shtc3.c:189:14:SHTC3_getHumidity	16	static

@@ -1,0 +1,16 @@
+Terminal 		Function
+K2					Contactor 1
+K3					Contactor 2
+K5					Fan 1
+K6					Fan 2
+K7					Fan 3
+K1					BoosterPump
+
+
+
+Input 			Function			pin
+X12				Pressure 1			pa8
+X16				Pressure 2			PC9
+X9				Water level Low		PC8
+X11				Water level high	PC7
+X8				HPressure			PC6
