@@ -46,6 +46,9 @@ typedef struct interfaceMain_var_t{
 	uint8_t notifState;
 	uint32_t notifTimeout;
 
+	uint8_t shutingDown_state;
+
+
 	void (*onShutingdown)();
 	uint8_t interface_notifIco;
 	uint8_t interface_onNotifState;

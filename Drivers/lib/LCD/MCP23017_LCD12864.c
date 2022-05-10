@@ -19,6 +19,7 @@ lcd_var lcd_ = {
 		.addr_ = 0x20,
 		.i2c_ = &hi2c1,
 		.pinIO = 0,
+		.flag_ = 1, // failed
 };
 
 lcd_ctrl ctrl_lcd = {
@@ -69,25 +70,25 @@ static void lcd_initDriverIO()
 	// init lcd
 	lcd_onParallelMode();
 	lcd_transfer(0, 0x30);
-	DWT_Delay_us(72);
+	DWT_Delay_us(75);
 	lcd_transfer(0, 0x34);
-	DWT_Delay_us(72);
+	DWT_Delay_us(75);
 	lcd_transfer(0, 0x30);
-	DWT_Delay_us(72);
+	DWT_Delay_us(75);
 	lcd_transfer(0, 0x0C);
-	DWT_Delay_us(72);
+	DWT_Delay_us(75);
 	lcd_transfer(0, 0x01);
-	DWT_Delay_us(72);
+	DWT_Delay_us(75);
 	lcd_transfer(0, 0x06);
-	DWT_Delay_us(300);
+	DWT_Delay_us(500);
 //	HAL_Delay(1);//(1600);
 
 	lcd_transfer(0, 0x34);
-	DWT_Delay_us(72);
+	DWT_Delay_us(75);
 	lcd_transfer(0, 0x36);
-	DWT_Delay_us(72);
+	DWT_Delay_us(75);
 	lcd_transfer(0, 0x80);
-	DWT_Delay_us(72);
+	DWT_Delay_us(75);
 	lcd_transfer(0, 0x80);
 
 
@@ -112,7 +113,10 @@ static void lcd_writeRegister(uint8_t reg, uint8_t value)
 	{
 		HAL_I2C_DeInit(lcd_.i2c_);
 		HAL_I2C_Init(lcd_.i2c_);
+		lcd_.flag_ = 1; // error
 	}
+	else
+		lcd_.flag_ = HAL_OK;
 
 }
 
@@ -124,8 +128,10 @@ static void lcd_writeRegisterPort(uint8_t reg, uint8_t portA, uint8_t portB)
 	if( HAL_I2C_Master_Transmit(lcd_.i2c_, lcd_.addr_<<1, data, 3, 100) !=HAL_OK)
 	{
 		HAL_I2C_DeInit(lcd_.i2c_);
-		HAL_I2C_Init(lcd_.i2c_);
-	};
+		HAL_I2C_Init(lcd_.i2c_);lcd_.flag_ = 1; // error
+	}
+	else
+		lcd_.flag_ = HAL_OK;
 }
 
 static void lcd_transfer(uint8_t type_, uint8_t data)
@@ -149,13 +155,13 @@ static void lcd_onParallelMode(void)
 {
     uint8_t val = 0x24;
     lcd_writeRegister(GPIO_A , val);
-    DWT_Delay_us(72);
+    DWT_Delay_us(75);
     val = 0x34;
     lcd_writeRegister(GPIO_A , val);
-    DWT_Delay_us(72);
+    DWT_Delay_us(75);
     val = 0x14;
     lcd_writeRegister(GPIO_A , val);
-    DWT_Delay_us(72);
+    DWT_Delay_us(75);
 }
 
 
@@ -200,6 +206,12 @@ void lcd_clear(bool type_clear, bool fill_type)
 
 void lcd_sendBuffer(bool type_flush)
 {
+	if( lcd_.flag_ != HAL_OK )
+	{
+		lcd_initDriverIO();
+		lcd_clear(0, 0);
+	};
+
 	uint8_t temp_buffer = 0x0;
 	if (type_flush == 0)
 	{
@@ -216,6 +228,11 @@ void lcd_sendBuffer(bool type_flush)
 				lcd_transfer(1, temp_buffer);
 				temp_buffer = 0x0;
 			}
+			if( lcd_.flag_ != HAL_OK )
+			{
+				lcd_initDriverIO();
+				lcd_clear(0, 0);
+			};
 		}
 	}
 	else if (type_flush == 1)
@@ -233,6 +250,11 @@ void lcd_sendBuffer(bool type_flush)
 				lcd_transfer(1, temp_buffer );
 				temp_buffer = 0x0;
 			}
+			if( lcd_.flag_ != HAL_OK )
+			{
+				lcd_initDriverIO();
+				lcd_clear(0, 0);
+			};
 		}
 	}
 }

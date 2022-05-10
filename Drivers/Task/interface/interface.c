@@ -105,6 +105,7 @@ void interface_init(void)
 	splashScreen.display (CENTER_, "Initialize", VERSION, 3500);
 	interfaceVar.ready = 0x01;
 	interface_onInit = 1;
+	interfaceVar.shutingDown_state = 0;
 }
 
 void interface_nextPage()
@@ -123,11 +124,16 @@ void interface_previousPage()
 void interface_onShutdown()
 {
 	osThreadSuspend(taskInterfaceHandle);
-//	vTaskSuspend(taskInterfaceHandle);
+	interfaceVar.shutingDown_state = 1;
+	vTaskSuspend(taskInterfaceHandle);
 	if( interfaceVar.onShutingdown )
 		interfaceVar.onShutingdown();
 	splashScreen.attachDelay(HAL_Delay);
-	splashScreen.display (CENTER_, "Shutting down", " ", 5000);
+	lcd.clear(1,0);
+	lcd.clearBuffer();
+	splashScreen.init(splashScreenICO, splashWidth, splashHeight, Font5x7);
+	splashScreen.display (CENTER_, "Shutting down", " ", 1000);
+	splashScreen.display (CENTER_, "Shutting down", " ", 5500);
 	HAL_NVIC_SystemReset();
 }
 

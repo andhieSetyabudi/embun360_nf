@@ -540,6 +540,7 @@ static inline void system_updateRunning(uint8_t state)
 {
 //	if( )
 }
+
 static inline void systemRuning()
 {
 	sysVar.sysFlag.systemRun++;

@@ -16,5 +16,5 @@ system.c:320:13:system_getTankStatusStr	16	static
 system.c:340:13:system_getTankModeStr	16	static
 system.c:357:13:system_getStatus	16	static
 system.c:385:6:taskSystem	48	static
-system.c:543:20:systemRuning	8	static
-system.c:592:6:system_resetLog	4	static
+system.c:544:20:systemRuning	8	static
+system.c:593:6:system_resetLog	4	static

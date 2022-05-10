@@ -311,7 +311,7 @@ void SensorTask(void *argument)
 		// update fin temperature sensor
 		if( sensorVar.finSensorFlag  /*|| ( sensorVar.finTmpErrCount < 3 )*/ )
 		{
-			if( HAL_GetTick() - finTempTimeCount >= 500UL )
+			if( HAL_GetTick() - finTempTimeCount >= 450UL )
 			{
 				ds18b20_requestTemperatures(&sensorCTRL_var.finTempSensor);
 				for(uint8_t a = 0; a < sensorCTRL_var.finTempSensor.numberOfDevices; a++)
@@ -323,13 +323,15 @@ void SensorTask(void *argument)
 						{
 							sensorVar.finSensorFlag = false;
 							sensorVar.fin_temperature[a] = tmp;
+							sensorVar.finTmpErrCount = 0;
 							break;
 						}
 
 					}else
+					{
 						sensorVar.fin_temperature[a] = tmp;
-					if( a == 1)
 						sensorVar.finTmpErrCount = 0;
+					};
 				}
 				finTempTimeCount = HAL_GetTick();
 			};

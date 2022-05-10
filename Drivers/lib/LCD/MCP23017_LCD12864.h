@@ -49,6 +49,7 @@ typedef struct __attribute__ ((__packed__)) lcd_var_
 	uint8_t BL;
 	uint16_t pinIO;
 	uint8_t addr_;
+	uint8_t flag_;
 }lcd_var;
 
 typedef struct __attribute__ ((__packed__)) lcd_ctrl_t{

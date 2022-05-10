@@ -137,7 +137,6 @@ RTC_TimeTypeDef time_;
 
 /* USER CODE END Private defines */
 
-
 #ifdef __cplusplus
 }
 #endif
