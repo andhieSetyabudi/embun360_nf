@@ -156,7 +156,7 @@ void taskButton(void *argument)
 			}
 			lastAnyButtonState = WAITING_btn;
 		}
-		osDelay(5);
+		osDelay(15);
 	}
 }
 

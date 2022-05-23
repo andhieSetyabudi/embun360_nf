@@ -31,6 +31,8 @@
 #include "MCP23017_LCD12864.h"
 #include "BSP.h"
 
+#include "eeprom.h"
+
 // task scheduler
 #include "sensor.h"
 #include "buttonThread.h"
@@ -66,14 +68,14 @@ TIM_HandleTypeDef htim14;
 osThreadId_t bspTaskHandle;
 const osThreadAttr_t bspTask_attributes = {
   .name = "bspTask",
-  .stack_size = 1024 * 4,
+  .stack_size = 256 * 4,
   .priority = (osPriority_t) osPriorityBelowNormal,
 };
 /* Definitions for button_task */
 osThreadId_t button_taskHandle;
 const osThreadAttr_t button_task_attributes = {
   .name = "button_task",
-  .stack_size = 2048 * 4,
+  .stack_size = 512 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for taskSensor */
@@ -87,7 +89,7 @@ const osThreadAttr_t taskSensor_attributes = {
 osThreadId_t taskInterfaceHandle;
 const osThreadAttr_t taskInterface_attributes = {
   .name = "taskInterface",
-  .stack_size = 4096 * 4,
+  .stack_size = 1024 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for systemTask */
@@ -175,12 +177,15 @@ void onStandBy(void)
 	lcd.clear(1,0);
 	lcd.clearBuffer();
 	splashScreen.init(splashScreenICO, splashWidth, splashHeight, Font5x7);
-	splashScreen.display (CENTER_, "Stand-by", VERSION, 500);
+	splashScreen.display (CENTER_, "Stand - by", VERSION, 500);
 	btState= button.check(&tmpBTN);
 	uint32_t count = 0;
 	uint8_t flip_ = 1;
 	uint32_t timeUp = 0;
 	uint8_t blinked=0;
+	eeprom_fillBuffer();
+	uint8_t eepromRead = 0;
+	eepromRead = eeprom_read_buffer(1);
 	while( 1 )
 	{
 		if( HAL_GetTick() - timeUp >= 750 )
@@ -188,13 +193,52 @@ void onStandBy(void)
 			rtc_getDateTime(&date_, &time_);
 			blinked =~ blinked;
 			timeUp = HAL_GetTick();
+
+//			if( eepromRead >=255 )
+//				eepromRead = 0;
+//			eepromRead++;
+//			eeprom_write_buffer(1, eepromRead);
+//			eeprom_flushBuffer();
+//			eeprom_fillBuffer();
+//			eepromRead = 0;
+//			eepromRead = eeprom_read_buffer(1);
+
 		}
-//		lcd.init(&hi2c1, 0x20);
-		sprintf(bText, "%02d%c%02d%c%02d",   time_.Hours, blinked!=0?':':' ',time_.Minutes, blinked!=0?':':' ', time_.Seconds);
+
+		sprintf(bText, "%02d%c%02d%c%02d",  eepromRead/*time_.Hours*/, blinked!=0?':':' ',time_.Minutes, blinked!=0?':':' ', time_.Seconds);
 		if( flip_ )
-			splashScreen.display(CENTER_, "Stand-by", bText, 75);
+			splashScreen.display(CENTER_, "Stand - by", bText, 75);
 		else
 			splashScreen.display(CENTER_, " ", bText, 75);
+		/*
+		lcd.clearBuffer();
+			lcd.setFont(Font5x8);
+			sprintf(buff,(const char*) " Status : asfafasf ");
+			lcd.text(1,15, buff);
+			// tank status
+			if( true )
+			{
+				sprintf(buff, " Tank    : filling ");
+				lcd.text(1,28, buff);
+			}
+			else
+			{
+				sprintf(buff, " Tank    : ");
+				lcd.text(1,28, buff);
+				lcd.drawBox(41, 28, 54, 8, 1, 1);
+				uint8_t fil_ = (uint8_t)(50.f*34/100.f);
+				lcd.drawFillBox(43,30,fil_ ,4,1);
+				sprintf(buff, (const char*) "45%%");
+				uint8_t xpos = 127 - lcd.getWitdthStr((const uint8_t*)buff, strlen(buff));
+				lcd.text(xpos,28, buff);
+			}
+
+			sprintf(buff, "Currently: 3.5 L");
+			lcd.text(1,41, buff);
+			sprintf(buff, "Total (M) : 4.6 L/M");
+			lcd.text(1,54, buff);
+			lcd.sendBuffer(1);
+		*/
 		btState= button.check(&tmpBTN);
 		if( btState == HELD_btn )
 			break;
@@ -328,8 +372,8 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.LSIState = RCC_LSI_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
-  RCC_OscInitStruct.PLL.PLLM = 13;
-  RCC_OscInitStruct.PLL.PLLN = 195;
+  RCC_OscInitStruct.PLL.PLLM = 16;
+  RCC_OscInitStruct.PLL.PLLN = 200;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = 4;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
@@ -441,7 +485,7 @@ static void MX_IWDG_Init(void)
 
   /* USER CODE END IWDG_Init 1 */
   hiwdg.Instance = IWDG;
-  hiwdg.Init.Prescaler = IWDG_PRESCALER_64;
+  hiwdg.Init.Prescaler = IWDG_PRESCALER_128;
   hiwdg.Init.Reload = 4095;
   if (HAL_IWDG_Init(&hiwdg) != HAL_OK)
   {
@@ -732,29 +776,24 @@ void StartDefaultTask(void *argument)
 	 sensor.sensorStart();
 	 while(interfaceMain.isReady() == 0 ) {osDelay(50);};
 	 btnTask.begin();
-
 	 uint8_t co = 0;
 	 bool flipFlop = false;
   for(;;)
   {
-//	  osDelay(500);
-//		  HAL_GPIO_WritePin(GPIO_A, GPIO_PIN_5, GPIO_PIN_SET);
-//	osDelay(500);
-//		  HAL_GPIO_WritePin(GPIO_A, GPIO_PIN_5, GPIO_PIN_RESET);
-
 	  co++;
 	  if( co% 10 == 0 )
 	  {
 		  HAL_IWDG_Refresh(&hiwdg);
 		  flipFlop = !flipFlop;
+		  rtc_getDateTime(&date_, &time_);
 		  co = 1;
 	  }
 
 	  HAL_IWDG_Refresh(&hiwdg);
 //	  tankLevelPercent+=0.1;
 //	  totalVolume+=0.5;
-	  rtc_getDateTime(&date_, &time_);
-	  osDelay(500);
+
+	  osDelay(100);
   }
   /* USER CODE END 5 */
 }

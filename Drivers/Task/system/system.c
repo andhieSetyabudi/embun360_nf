@@ -70,6 +70,8 @@ PORT_IO portInput[5] = {
 systemVar sysVar = {0};
 sysMem paramBuffer;
 
+RTC_DateTypeDef date_;
+RTC_TimeTypeDef time_;
 
 void systemInputInterrupt_handler( uint16_t GPIO_Pin )
 {
@@ -387,6 +389,26 @@ void taskSystem(void *argument)
 	system_initIO();
 	uint32_t size_data = 0;
 	// check memory
+
+	eeprom_fillBuffer();
+	size_data = sizeof(sysMem);
+	eeprom_get_buffer(0,(uint8_t* )&sysVar.memory, size_data);
+	uint8_t conf = eeprom_read_buffer(0);
+	if( conf == 0xff && eeprom_read_buffer(1)==0xff && eeprom_read_buffer(2)==0xff)
+	{
+		system_resetMemory();
+		size_data = sizeof(sysMem);
+		eeprom_put_buffer(0, (uint8_t* )&sysVar.memory, size_data);
+		eeprom_flushBuffer();
+	}
+	else
+	{
+		size_data = sizeof(sysMem);
+		eeprom_get_buffer(0,(uint8_t* )&sysVar.memory, size_data);
+	}
+//	eeprom_fillBuffer();
+//	eeprom_get_buffer(0,(uint8_t* )&sysVar.memory, size_data);
+	/*
 	rtc_get_memory(0,(uint8_t* )&size_data, sizeof(size_data));
 	if( size_data == 0xFFFFFFFF )
 	{
@@ -398,7 +420,7 @@ void taskSystem(void *argument)
 	{
 		size_data = sizeof(sysMem);
 		rtc_get_memory(0,(uint8_t* )&sysVar.memory, size_data);
-	}
+	}*/
 	sensor.setTankHeight_const(sysVar.memory.waterTankHeight);
 	sensor.setWaterFlow_const(sysVar.memory.waterLevelConst);
 	normalizeMinimumTemperature(&sysVar.memory.minFinTemperature);
@@ -507,10 +529,11 @@ void taskSystem(void *argument)
 //		}
 
 		// back-up to memory ( Emulated EEPROM )
-		if( osKernelGetTickCount() < timeBAK )	// prevent for roll-over the tick-counting
-			timeBAK = osKernelGetTickCount();
-		if( osKernelGetTickCount() - timeBAK >= 5000UL )
+		if( HAL_GetTick() < timeBAK )	// prevent for roll-over the tick-counting
+			timeBAK = HAL_GetTick();
+		if( HAL_GetTick() - timeBAK >= 5000UL )
 		{
+			size_data = sizeof(sysMem);
 			sysVar.memory.month = date_.Month;
 			sysVar.memory.date	= date_.Date;
 			uint8_t *a = (uint8_t *)&paramBuffer;
@@ -519,14 +542,17 @@ void taskSystem(void *argument)
 			{
 				if( *a != *b )
 				{
-					rtc_put_memory(0,(uint8_t* )&sysVar.memory, size_data);
+//					rtc_put_memory(0,(uint8_t* )&sysVar.memory, size_data);
+					eeprom_put_buffer(0,(uint8_t* )&sysVar.memory, size_data);
+					eeprom_flushBuffer();
+//					eeprom_fillBuffer();
 					paramBuffer = sysVar.memory;
 //					rtc_get_memory(0,(uint8_t* )&sysVar.memory, size_data);
 					break;
 				}
 				a++; b++;
 			}
-			timeBAK = osKernelGetTickCount();
+			timeBAK = HAL_GetTick();
 		}
 
 		system_updateOutput(outputState);

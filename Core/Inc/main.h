@@ -132,8 +132,7 @@ void Error_Handler(void);
 #define MFG_YEAR	22 // 2022
 
 
-RTC_DateTypeDef date_;
-RTC_TimeTypeDef time_;
+
 
 /* USER CODE END Private defines */
 

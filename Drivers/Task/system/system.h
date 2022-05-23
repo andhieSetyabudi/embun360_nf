@@ -105,7 +105,8 @@ extern system_func system_t;
 
 extern void taskSystem(void *argument);
 
-
+extern RTC_DateTypeDef date_;
+extern RTC_TimeTypeDef time_;
 
 
 #endif /* TASK_SYSTEM_SYSTEM_H_ */
