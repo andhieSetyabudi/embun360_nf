@@ -32,7 +32,7 @@ typedef enum splash_align_t{
 	RIGHT_ = 2,
 }splash_align;
 
-void (*splScr_delay)(uint32_t time_);
+//void (*splScr_delay)(uint32_t time_);
 static void splScr_attachHalt(void (*v)(uint32_t time_));
 static void splScr_halt(uint32_t time_);
 static void splScr_init(const uint8_t* bmp, uint8_t width, uint8_t height, const uint8_t* font);

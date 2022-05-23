@@ -11,7 +11,7 @@ uint8_t* bmpHex = NULL;
 uint8_t bmpWidth  = 0;
 uint8_t bmpHeight = 0;
 
-void (*splScr_delay)(uint32_t time_) = NULL;
+static void (*splScr_delay)(uint32_t time_) = NULL;
 void splScr_attachHalt(void (*v)(uint32_t time_))
 {
 	splScr_delay = v;
