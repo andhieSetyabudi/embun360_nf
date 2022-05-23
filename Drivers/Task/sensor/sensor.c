@@ -163,14 +163,14 @@ uint32_t pulseIn( GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, uint8_t state, uint32_
 	uint8_t stateMask = SN_GPIO_GetInputPinValue(GPIOx, GPIO_Pin);
 	uint32_t counter = 0;
 	// wait for any previous pulse to end
-//	while( stateMask == state )
-//	{
-//		counter++;
-//		if( counter > timeout )
-//			return 0;
-//		stateMask = SN_GPIO_GetInputPinValue(GPIOx, GPIO_Pin);
-//		DWT_Delay_us(1);
-//	}
+	while( stateMask == state )
+	{
+		counter++;
+		if( counter > timeout )
+			return 0;
+		stateMask = SN_GPIO_GetInputPinValue(GPIOx, GPIO_Pin);
+		DWT_Delay_us(1);
+	}
 
 	// wait for the pulse to start
 	counter=0;
@@ -205,7 +205,8 @@ static void ultrasonic_measuring(void)
 	DWT_Delay_us(20);
 
 	SN_GPIO_SetPinLow(US_TRIGER_GPIO_Port, US_TRIGER_Pin);
-	uint32_t duration = pulseIn(US_ECHO_GPIO_Port, US_ECHO_Pin, 1, 5800000UL);
+//	HAL_IWDG_Refresh(&hiwdg);
+	uint32_t duration = pulseIn(US_ECHO_GPIO_Port, US_ECHO_Pin, 1, 3600000UL);
 	sensorVar.waterLevelFrom_cap = (float)duration * 0.034/2.f;
 }
 
@@ -245,9 +246,16 @@ void sensorInit(void)
 			sensorVar.finSensorFlag = true;
 		else
 			sensorVar.finSensorFlag = false;
-		for(uint8_t a = 0; a < sensorCTRL_var.finTempSensor.numberOfDevices; a++)
-			ds18b20_searchAddress(&sensorCTRL_var.finTempSensor, sensorCTRL_var.finTempAddr[a], a);
-		ds18b20_requestTemperatures(&sensorCTRL_var.finTempSensor);
+		if( sensorVar.finSensorFlag )
+		{
+			ds18b20_requestTemperatures(&sensorCTRL_var.finTempSensor);
+			for(uint8_t a = 0; a < sensorCTRL_var.finTempSensor.numberOfDevices; a++)
+			{
+				ds18b20_searchAddress(&sensorCTRL_var.finTempSensor, sensorCTRL_var.finTempAddr[a], a);
+				float tmp = ds18b20_getTempCByAddress(&sensorCTRL_var.finTempSensor,sensorCTRL_var.finTempAddr[a],false );
+				sensorVar.fin_temperature[a] = tmp;
+			};
+		};
 	}else
 		sensorVar.finSensorFlag = false;
 	sensorVar.finTmpErrCount = 0;
@@ -267,7 +275,6 @@ void sensorInit(void)
 		sensorVar.airSensorFlag = false;
 #endif
 	osDelay(100);
-
 }
 
 static uint8_t sensorTaskRun = 0;
@@ -299,8 +306,10 @@ void SensorTask(void *argument)
 	sensorInit();
 	osDelay(500);
 	uint32_t finTempTimeCount = 0;
+	uint32_t USTimeCount = 0;
 	float tmp=0.f;
 	uint32_t timeSens = 0;
+
 	for(;;)
 	{
 //		if( HAL_GetTick() - timeSens >= 1000UL )
@@ -311,11 +320,12 @@ void SensorTask(void *argument)
 		// update fin temperature sensor
 		if( sensorVar.finSensorFlag  /*|| ( sensorVar.finTmpErrCount < 3 )*/ )
 		{
-			if( HAL_GetTick() - finTempTimeCount >= 450UL )
+			if( HAL_GetTick() - finTempTimeCount >= 500UL )
 			{
 				ds18b20_requestTemperatures(&sensorCTRL_var.finTempSensor);
 				for(uint8_t a = 0; a < sensorCTRL_var.finTempSensor.numberOfDevices; a++)
 				{
+					ds18b20_searchAddress(&sensorCTRL_var.finTempSensor, sensorCTRL_var.finTempAddr[a], a);
 					tmp = ds18b20_getTempCByAddress(&sensorCTRL_var.finTempSensor,sensorCTRL_var.finTempAddr[a],false );
 					if( (int)tmp == (int)DEVICE_DISCONNECTED_RAW ) {
 						sensorVar.finTmpErrCount++;
@@ -350,7 +360,7 @@ void SensorTask(void *argument)
 				sensorVar.finSensorFlag = false;
 			finTempTimeCount = HAL_GetTick();
 		}
-		osDelay(100);
+		osDelay(50);
 
 		// update air temperature and humidity sensor
 		if( sensorVar.airSensorFlag ) {
@@ -380,11 +390,16 @@ void SensorTask(void *argument)
 			else
 				sensorVar.airSensorFlag = false;
 		};
-		osDelay(100);
+		osDelay(50);
 
 		// updating water level sensor in tank
-		sensor_waterLevelMeasuring();
-		osDelay(100);
+		if( HAL_GetTick() - USTimeCount >= 1000UL )
+		{
+			sensor_waterLevelMeasuring();
+			USTimeCount = HAL_GetTick();
+		}
+
+		osDelay(50);
 	}
 	sensorTaskRun = 0;
 }

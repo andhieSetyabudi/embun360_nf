@@ -187,7 +187,7 @@ void interface_drawPage1(void)
 //	else
 //		tmp_u = 0;
 	system_t.getStatus(strBuf);
-	sprintf(buff,(const char*) " Status : %8s ",strBuf);
+	sprintf(buff,(const char*)" Status   %8s ",strBuf);
 	lcd.text(1,15, buff);
 	// tank status
 	if( interfaceVar.tankMode )
@@ -200,7 +200,9 @@ void interface_drawPage1(void)
 			tmp_u = *interfaceVar.tankFillingStatus;
 		else
 			tmp_u = 0;
-		sprintf(buff, " Tank    : %s ",system_t.getTankStatusStr(tmp_u, strBuf));
+		//sprintf(buff, " Tank    : %s ",system_t.getTankStatusStr(tmp_u, strBuf));
+		sprintf(buff, " RSVR     %8s ",system_t.getTankStatusStr(tmp_u, strBuf));
+
 		lcd.text(1,28, buff);
 	}
 	else
@@ -210,7 +212,7 @@ void interface_drawPage1(void)
 		else
 			tmp = 0.f;
 		tmp = tmp>100.f ? 100.f:tmp;
-		sprintf(buff, " Tank    : ");
+		sprintf(buff, " RSVR      ");
 		lcd.text(1,28, buff);
 		lcd.drawBox(41, 28, 54, 8, 1, 1);
 		uint8_t fil_ = (uint8_t)(50.f*tmp/100.f);
@@ -225,8 +227,10 @@ void interface_drawPage1(void)
 		tmp = *interfaceVar.currentVolume;
 	else
 		tmp = 0;
-	sprintf(buff, "Currently: %7sL",  ftoa(tmp, val1, 3));
+	sprintf(buff, (const char*)" Curr.");//        %.9sL",  ftoa(tmp, val1, 3));
 	lcd.text(1,41, buff);
+	sprintf(buff, "%.9sL",  ftoa(tmp, val1, 3));
+	lcd.text(48,41, buff);
 
 	// total volume
 	if( interfaceVar.totalVolume )
@@ -243,8 +247,15 @@ void interface_drawPage1(void)
 	}
 	if( tmp2 < 0.15f && tmp > 0  && id_ == 0 )
 		tmp2 = tmp;
-	sprintf(buff, "Total (M) : %6s %s/M",  ftoa(tmp2, val1, id_ > 0 ? 2 : 1),unit[id_]);
+	sprintf(buff, (const char*)" Sum (M)");   //  %.9s %s/M",  ftoa(tmp2, val1, id_ > 0 ? 2 : 1),unit[id_]);
 	lcd.text(1,54, buff);
+	sprintf(buff,"%.9s %s/M",  ftoa(tmp2, val1, id_ > 0 ? 2 : 1),unit[id_]);
+	lcd.text(48,54, buff);
+	// create separator marker
+	lcd.text(38,15,":");
+	lcd.text(38,28,":");
+	lcd.text(38,41,":");
+	lcd.text(38,54,":");
 }
 
 /*
@@ -287,13 +298,13 @@ void interface_drawPage2(void)
 		tmp = *interfaceVar.finTemp1;
 	else
 		tmp = 0;
-	sprintf(buff, " Fin       : %4s%cC",  ftoa(tmp, val1, 2), 0xB0);
+	sprintf(buff, " Fin       : %.4s%cC",  ftoa((tmp>-1.f?tmp:0.f), val1, 2), 0xB0);
 	lcd.text(1,41, buff);
 	if( interfaceVar.finTemp2 )
 		tmp = *interfaceVar.finTemp2;
 	else
 		tmp = 0;
-	sprintf(buff, "%4s%cC",  ftoa(tmp, val1, 2), 0xB0);
+	sprintf(buff, "%.4s%cC",  ftoa((tmp>-1.f?tmp:0.f), val1, 2), 0xB0);
 	xpos = 127 - lcd.getWitdthStr((const uint8_t*)buff, strlen(buff));
 	lcd.text(xpos,41, buff);
 
@@ -410,7 +421,7 @@ void interface_drawNotification()
 	interfaceVar.notifTimeout = 0;
 	interfaceVar.interface_notifIco = 0;
 	lcd.clearBuffer();
-	lcd.init(&hi2c1, 0x20);
+//	lcd.init(&hi2c1, 0x20);
 }
 
 
@@ -430,7 +441,6 @@ void InterfaceTask(void *argument)
 	interfaceVar.ready = 1;
 	btnTask.attachLongPressed(BTN_PWR, interface_onShutdown);
 	system_t.beeper(100, 1);
-//	btnTask.attachLongPressed(BTN_OK, interface_drawNotification );
 	btnTask.attachAnyPressed(interface_buttonBeep);
 	for(;;)
 	{
@@ -491,15 +501,12 @@ void InterfaceTask(void *argument)
 				else
 				{
 					if( sysVar.sysFlag.systemRun == system_STOPPED )
-						interfaceMain.showNotification("Long press for \n \"Starting\" \n \n", 4, 1000UL);
+						interfaceMain.showNotification(" \n Long press for \n \n \" Starting \" \n", 4, 1000UL);
 					else
-						interfaceMain.showNotification("Long press for \n \"Terminating\" \n \n", 4, 1000UL);
+						interfaceMain.showNotification(" \n Long press for \n  \n \" Terminating \" \n", 4, 1000UL);
 				}
 
 			}
-
-
-
 
 			if( interfaceVar.interface_onNotifState == 0 )
 			{
